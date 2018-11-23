@@ -1,0 +1,9 @@
+AABB a
+AABb a
+AAbb a
+AaBB a
+AaBb a*(1+b)
+Aabb a*(1+b)
+aaBB a
+aaBb a*(1+b)
+aabb a*(1+b)

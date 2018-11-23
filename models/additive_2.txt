@@ -1,0 +1,9 @@
+AABB a
+AABb a*(1+b)
+AAbb a*(1+b)^2
+AaBB a*(1+b)
+AaBb a*(1+b)^2
+Aabb a*(1+b)^3
+aaBB a*(1+b)^2
+aaBb a*(1+b)^3
+aabb a*(1+b)^4
