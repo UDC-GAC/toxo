@@ -1,13 +1,22 @@
 classdef Model
-    %MODEL Summary of this class goes here
-    %   Detailed explanation goes here
+    %MODEL Parametric representation of a penetrance model as a function
+    %of the baseline effects and genotypic effects.
+    %   Class Model represents a penetrance table as a function of two
+    %   variables:
+    %     -The baseline effect, or alpha: probability of developing the
+    %     phenotype of interest when none of the phenotype-associated
+    %     alleles are present.
+    %     -The genotypic effect, or beta: additional probability linked
+    %     with each phenotype-associated allele.
+    %   The class Model provides methods to obtain numeric penetrance
+    %   tables derived from the parametric representation given as input.
     
     properties
-        order
-        symbolic_penetrances
+        order                 % Number of loci involved in the epistatic model.
+        symbolic_penetrances  % Array of symbolic expressions, representing the epistatic model.
     end
     
-    methods (Access = protected, Static = true)
+    methods (Access = private, Static = true)
         function [c, ceq] = hconstraint(pt, h)
             c = [];
             ceq = pt.heritability() - h;
@@ -21,11 +30,21 @@ classdef Model
     
     methods
         function obj = Model(path)
-            %MODEL Construct an instance of this class
-            %   Detailed explanation goes here
+        % MODEL Construct an instance of this class from the given model.
+        %   M = MODEL(P) reads the model from its text representation in
+        %   file path P.
+        %
+        %   Each line of the file P represents a row of the model,
+        %   consisting of the genotype definition and the probability
+        %   associated with the given genotype, separated by (any number
+        %   of) spaces.
+        %   Probability is expressed as a function of the variables a
+        %   (representing the baseline effect) and b (represeting the
+        %   genotypic effect).
+        %   Lines starting with # (comments) will be ignored.
             
             fid = fopen(path, 'r');
-            content = textscan(fid, "%s %s");
+            content = textscan(fid, "%s %s", "CommentStyle", "#");
             fclose(fid);
             [~, index] = sort(content{1});
             obj.symbolic_penetrances = str2sym(content{2}(index));
@@ -33,14 +52,20 @@ classdef Model
         end
         
         function p = genotype_probabilities(obj, maf)
+        % GENOTYPE_PROBABILITIES Compute the probabilities associated with each genotype for a given MAF.
+        
             p = prod(toxo.nfold([(1 - maf)^2, 2 * maf * (1 - maf), maf^2], obj.order), 2);
         end
         
         function pt = find_max_prevalence(obj, maf, h)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            
-            % Create minimization problem
+        % FIND_MAX_PREVALENCE Compute the penetrance table of the model with the maximum admissible prevalence given its MAF and heritability.
+        %   PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
+        %   maximum admissible prevalence given the MAF and heritability
+        %   restraints.
+        %   Finding the maximum prevalence requires solving a minimization
+        %   problem, since the resulting equation system involves
+        %   non-polynomial terms and can not be solved analytically.
+
             highest_degree_monomial = obj.symbolic_penetrances(end);
             bfunction = matlabFunction(rhs(isolate(highest_degree_monomial == 1, sym('b'))));
             lb = 0;
@@ -53,16 +78,19 @@ classdef Model
                 ME = MException("toxo.Model:no_solution", output.message);
                 throw(ME);
             end
-            
-            % Obtain the resulting heritability and penetrance table
             pt = toxo.PT(obj, maf, alpha, beta);
         end
         
         function pt = find_max_heritability(obj, maf, p)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
+        % FIND_MAX_HERITABILITY Compute the penetrance table of the model with the maximum admissible heritability given its MAF and prevalence.
+        %   PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
+        %   maximum admissible heritability given the MAF and prevalence
+        %   restraints.
+        %   Finding the maximum heritability requires solving a 
+        %   minimization problem, since the resulting equation system
+        %   involves non-polynomial terms and can not be solved
+        %   analytically.
             
-            % Create minimization problem
             highest_degree_monomial = obj.symbolic_penetrances(end);
             afunction = matlabFunction(rhs(isolate(highest_degree_monomial == 1, sym('a'))));
             lb = 0;
@@ -75,8 +103,6 @@ classdef Model
                 ME = MException("toxo.Model:no_solution", output.message);
                 throw(ME);
             end
-
-            % Obtain the resulting heritability and penetrance table
             pt = toxo.PT(obj, maf, alpha, beta);
         end
     end
