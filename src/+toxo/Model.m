@@ -77,7 +77,7 @@ classdef Model
             options = optimoptions('fmincon', 'Display', 'none', 'StepTolerance', 1e-120, 'ConstraintTolerance', 1e-3);
             [alpha, beta, exitflag, output] = fmincon(bfunction, x0, [], [], [], [], lb, ub, nonlcon, options);
             if exitflag < 0
-                ME = MException("toxo.Model:no_solution", output.message);
+                ME = MException("Model:no_solution", output.message);
                 throw(ME);
             end
             pt = toxo.PT(obj, maf, alpha, beta);
@@ -102,7 +102,7 @@ classdef Model
             options = optimoptions('fmincon', 'Display', 'none', 'StepTolerance', 1e-120, 'ConstraintTolerance', 1e-3);
             [beta, alpha, exitflag, output] = fmincon(afunction, x0, [], [], [], [], lb, ub, nonlcon, options);
             if exitflag < 0
-                ME = MException("toxo.Model:no_solution", output.message);
+                ME = MException("Model:no_solution", output.message);
                 throw(ME);
             end
             pt = toxo.PT(obj, maf, alpha, beta);
