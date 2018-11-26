@@ -43,7 +43,7 @@ classdef PT
             obj.alpha = alpha;
             obj.beta = beta;
             obj.gt_p = model.genotype_probabilities(maf);
-            obj.pt = double(subs(model.pt_s, [sym('a'), sym('b')], [alpha, beta]));
+            obj.pt = double(subs(model.symbolic_penetrances, [sym('a'), sym('b')], [alpha, beta]));
         end
         
         function p = prevalence(obj)
