@@ -1,9 +1,16 @@
-AABB a
-AABb a*(1+b)
-AAbb a*(1+b)^2
-AaBB a*(1+b)
-AaBb a*(1+b)^2
-Aabb a*(1+b)^3
-aaBB a*(1+b)^2
-aaBb a*(1+b)^3
-aabb a*(1+b)^4
+# Jonathan Marchini, Peter Donnelly, and Lon R. Cardon
+# Genome-Wide Strategies for Detecting Multiple Loci That Influence Complex Diseases
+# Nature Genetics 37, no. 4 (April 2005): 413–17
+# https://doi.org/10.1038/ng1537.
+# 
+# 2-way additive epistatic model
+
+AABB    a
+AABb    a*(1+b)
+AAbb    a*(1+b)^2
+AaBB    a*(1+b)
+AaBb    a*(1+b)^2
+Aabb    a*(1+b)^3
+aaBB    a*(1+b)^2
+aaBb    a*(1+b)^3
+aabb    a*(1+b)^4
