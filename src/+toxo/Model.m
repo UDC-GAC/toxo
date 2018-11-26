@@ -12,6 +12,7 @@ classdef Model
     %   tables derived from the parametric representation given as input.
     
     properties
+        name                  % Name of the model.
         order                 % Number of loci involved in the epistatic model.
         symbolic_penetrances  % Array of symbolic expressions, representing the epistatic model.
     end
@@ -49,6 +50,7 @@ classdef Model
             [~, index] = sort(content{1});
             obj.symbolic_penetrances = str2sym(content{2}(index));
             obj.order = length(content{1}{1}) / 2;
+            [~, obj.name, ~] = fileparts(path);
         end
         
         function p = genotype_probabilities(obj, maf)
