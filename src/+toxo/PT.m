@@ -1,6 +1,7 @@
 classdef PT
-    %PT Summary of this class goes here
-    %   Detailed explanation goes here
+    % PT Numeric representation of a penetrance table.
+    %   This class provides methods to compute the associated penetrance
+    %   and heritability, as well as multiple output formats to the table.
     
     properties (Constant)
         format_plaintext = 0
@@ -8,15 +9,15 @@ classdef PT
     end
     
     properties
-        order
-        maf
-        alpha
-        beta
-        gt_p
-        pt
+        order  % Number of loci involved in the penetrance table.
+        maf    % Common MAF of all locis involved in the interaction.
+        alpha  % Baseline effect of all phenotype-associated alleles.
+        beta   % Genotypic effect of all phenotype-associated alleles.
+        gt_p   % Genotype probability table array.
+        pt     % Penetrance table array.
     end
     
-    methods (Static = true, Access = protected)
+    methods (Access = private, Static = true)
         function [s] = pt_to_string_table(pt, o)
             n = length(pt) / 3;
             if o > 2
@@ -35,8 +36,10 @@ classdef PT
     
     methods
         function obj = PT(model, maf, alpha, beta)
-            %PT Construct an instance of this class
-            %   Detailed explanation goes here
+        % PT Create a penetrance table from a given Model, using the MAF, alpha and beta desired.
+        %   P = PT(MODEL, M, A, B) creates a penetrance table P following
+        %   model description MODEL and using MAF M, baseline effect A and
+        %   genotypic effect B.
             
             obj.order = model.order;
             obj.maf = maf;
@@ -47,21 +50,28 @@ classdef PT
         end
         
         function p = prevalence(obj)
-            % PREVALENCE Compute the prevalence of the given penetrance table using
-            %   the genotype combination probabilities.
+        % PREVALENCE Compute the prevalence of the penetrance table.
 
             p = sum(obj.pt .* obj.gt_p);
         end
         
         function h = heritability(obj)
-            % HERITABILITY Compute the heritability of the given penetrance table using
-            %   its prevalence value and the genotype combination probabilities.
+        % HERITABILITY Compute the heritability of the penetrance table.
 
             p = obj.prevalence();
             h = sum((obj.pt - p).^2 .* obj.gt_p) / p * (1 - p);
         end
         
         function write(obj, path, format)
+        % WRITE Write the penetrance into a text file using a specific output format.
+        %   P.WRITE(PATH, FORMAT) writes the penetrance table P into the
+        %   file specified in PATH using format FORMAT. FORMAT can take any
+        %   of these values:
+        %     -PT.format_paintext: text-format output file, with each row
+        %     corresponding to a genotype from the penetrance table and its
+        %     associated phenotype probability.
+        %     -PT.format_gametes: GAMETES compatible model output format.
+        
             switch format
                 case obj.format_plaintext
                     gt_strings = char(char(join(toxo.nfold(["AA" "Aa" "aa"], obj.order), "")) + repelem(0:obj.order - 1, 2));
