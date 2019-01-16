@@ -14,7 +14,8 @@ classdef Model
     properties
         name                  % Name of the model.
         order                 % Number of loci involved in the epistatic model.
-        symbolic_penetrances  % Array of symbolic expressions, representing the epistatic model.
+        penetrances           % Array of symbolic expressions, representing the epistatic model.
+        variables             % List of all variables contained in all symbolic expressions
     end
     
     methods (Access = private, Static = true)
@@ -44,13 +45,15 @@ classdef Model
         %   genotypic effect).
         %   Lines starting with # (comments) will be ignored.
             
-            fid = fopen(path, 'r');
-            content = textscan(fid, "%s %s", "CommentStyle", "#");
-            fclose(fid);
-            [~, index] = sort(content{1});
-            obj.symbolic_penetrances = str2sym(content{2}(index));
-            obj.order = length(content{1}{1}) / 2;
             [~, obj.name, ~] = fileparts(path);
+            fid = fopen(path, 'r');
+            content = textscan(fid, "%[^,], %[^,\n]", "CommentStyle", "#", "TextType", "string", "CollectOutput", true, "ReturnOnError", false);
+            fclose(fid);
+            content = content{1};
+            [~, index] = sort(content(:,1));
+            obj.penetrances = str2sym(content(index,2));
+            obj.variables = symvar(obj.penetrances);
+            obj.order = strlength(content(1,1)) / 2;
         end
         
         function p = genotype_probabilities(obj, maf)
