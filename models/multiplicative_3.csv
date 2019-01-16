@@ -1,0 +1,34 @@
+# Jonathan Marchini, Peter Donnelly, and Lon R. Cardon
+# Genome-Wide Strategies for Detecting Multiple Loci That Influence Complex Diseases
+# Nature Genetics 37, no. 4 (April 2005): 413–17
+# https://doi.org/10.1038/ng1537.
+# 
+# 3-way multiplicative epistatic model
+
+AABBCC, x
+AABBCc, x
+AABBcc, x
+AABbCC, x
+AABbCc, x
+AABbcc, x
+AAbbCC, x
+AAbbCc, x
+AAbbcc, x
+AaBBCC, x
+AaBBCc, x
+AaBBcc, x
+AaBbCC, x
+AaBbCc, x*(1+y)
+AaBbcc, x*(1+y)^2
+AabbCC, x
+AabbCc, x*(1+y)^2
+Aabbcc, x*(1+y)^4
+aaBBCC, x
+aaBBCc, x
+aaBBcc, x
+aaBbCC, x
+aaBbCc, x*(1+y)^2
+aaBbcc, x*(1+y)^4
+aabbCC, x
+aabbCc, x*(1+y)^4
+aabbcc, x*(1+y)^8

@@ -3,14 +3,14 @@
 # Nature Genetics 37, no. 4 (April 2005): 413–17
 # https://doi.org/10.1038/ng1537.
 # 
-# 2-way threshold epistatic model
+# 2-way multiplicative epistatic model
 
-AABB    a
-AABb    a
-AAbb    a
-AaBB    a
-AaBb    a*(1+b)
-Aabb    a*(1+b)
-aaBB    a
-aaBb    a*(1+b)
-aabb    a*(1+b)
+AABB, x
+AABb, x
+AAbb, x
+AaBB, x
+AaBb, x*(1+y)
+Aabb, x*(1+y)^2
+aaBB, x
+aaBb, x*(1+y)^2
+aabb, x*(1+y)^4
