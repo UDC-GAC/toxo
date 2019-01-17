@@ -1,23 +1,27 @@
 classdef PTable
-    % PT Numeric representation of a penetrance table.
-    %   This class provides methods to compute the associated penetrance
-    %   and heritability, as well as multiple output formats to the table.
-    
-    properties (Constant)
-        format_plaintext = 0
-        format_gametes = 1
-    end
+    %PTable Numeric representation of a penetrance table. This class pro-
+    % vides methods to calculate its associated penetrance and heritabi-
+    % lity, as well as a method to write the table to a file in several
+    % formats.
     
     properties
         order  % Number of loci involved in the penetrance table.
         maf    % Common MAF of all locis involved in the interaction.
-        alpha  % Baseline effect of all phenotype-associated alleles.
-        beta   % Genotypic effect of all phenotype-associated alleles.
-        gt_p   % Genotype probability table array.
+        val    % Values of the two variables in the original model.
+        gp     % Genotype probability table array.
         pt     % Penetrance table array.
     end
     
     methods (Access = private, Static = true)
+        function n = counter()
+            persistent value;
+            if isempty(value)
+                value = 0;
+            end
+            n = value;
+            value = value + 1;
+        end
+        
         function [s] = pt_to_string_table(pt, o)
             n = length(pt) / 3;
             if o > 2
@@ -34,8 +38,27 @@ classdef PTable
         end
     end
     
+    % Since MATLAB doesn't allow the definition of static variables, they have to be encapsulated inside static methods with the "persistent" definition
+    methods (Static = true)
+        function out = format_plaintext()
+            persistent plaintext;
+            if isempty(plaintext)
+                plaintext = toxo.PTable.counter;
+            end
+            out = plaintext;
+        end
+        
+        function out = format_gametes()
+            persistent gametes;
+            if isempty(gametes)
+                gametes = toxo.PTable.counter;
+            end
+            out = gametes;
+        end
+    end
+    
     methods
-        function obj = PT(model, maf, alpha, beta)
+        function obj = PTable(model, maf, values)
         % PT Create a penetrance table from a given Model, using the MAF, alpha and beta desired.
         %   P = PT(MODEL, M, A, B) creates a penetrance table P following
         %   model description MODEL and using MAF M, baseline effect A and
@@ -43,10 +66,9 @@ classdef PTable
             
             obj.order = model.order;
             obj.maf = maf;
-            obj.alpha = alpha;
-            obj.beta = beta;
-            obj.gt_p = model.genotype_probabilities(maf);
-            obj.pt = double(subs(model.symbolic_penetrances, [sym('a'), sym('b')], [alpha, beta]));
+            obj.val = values;
+            obj.gp = toxo.genotype_probabilities(maf, model.order);
+            obj.pt = double(subs(model.symbolic_penetrances, model.variables, [x, y]));
         end
         
         function p = prevalence(obj)

@@ -69,7 +69,7 @@ classdef Model
             solutions = arrayfun(@(z, t) isreal(z) && isreal(t) && z >= 0 && t >= 0, x, y);
             x = x(solutions);
             y = y(solutions);
-            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, z, t), x, y);
+            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, [z, t]), x, y);
         end
         
         function pt = find_max_heritability(obj, maf, p)
@@ -90,7 +90,7 @@ classdef Model
             solutions = arrayfun(@(z, t) isreal(z) && isreal(t) && z >= 0 && t >= 0, x, y);
             x = x(solutions);
             y = y(solutions);
-            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, z, t), x, y);
+            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, [z, t]), x, y);
         end
     end
 end
