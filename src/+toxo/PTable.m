@@ -1,4 +1,4 @@
-classdef PT
+classdef PTable
     % PT Numeric representation of a penetrance table.
     %   This class provides methods to compute the associated penetrance
     %   and heritability, as well as multiple output formats to the table.
@@ -21,13 +21,13 @@ classdef PT
         function [s] = pt_to_string_table(pt, o)
             n = length(pt) / 3;
             if o > 2
-                s = toxo.PT.pt_to_string_table(pt(1:n), o - 1) + newline + ...
-                    toxo.PT.pt_to_string_table(pt(n + 1:2 * n), o - 1) + newline + ...
-                    toxo.PT.pt_to_string_table(pt(2 * n + 1:end), o - 1);
+                s = toxo.PTable.pt_to_string_table(pt(1:n), o - 1) + newline + ...
+                    toxo.PTable.pt_to_string_table(pt(n + 1:2 * n), o - 1) + newline + ...
+                    toxo.PTable.pt_to_string_table(pt(2 * n + 1:end), o - 1);
             elseif o == 2
-                s = toxo.PT.pt_to_string_table(pt(1:n), o - 1) + ...
-                    toxo.PT.pt_to_string_table(pt(n + 1:2 * n), o - 1) + ...
-                    toxo.PT.pt_to_string_table(pt(2 * n + 1:end), o - 1);
+                s = toxo.PTable.pt_to_string_table(pt(1:n), o - 1) + ...
+                    toxo.PTable.pt_to_string_table(pt(n + 1:2 * n), o - 1) + ...
+                    toxo.PTable.pt_to_string_table(pt(2 * n + 1:end), o - 1);
             else
                 s = join(arrayfun(@(x) sprintf("%.12f", x), pt), ", ") + newline;
             end
@@ -95,7 +95,7 @@ classdef PT
                     p = obj.prevalence();
                     h = obj.heritability();
                     fid = fopen(path, 'w+');
-                    fprintf(fid, header_template, names, maf_list, obj.alpha, obj.beta, p, h, toxo.PT.pt_to_string_table(obj.pt, obj.order));
+                    fprintf(fid, header_template, names, maf_list, obj.alpha, obj.beta, p, h, toxo.PTable.pt_to_string_table(obj.pt, obj.order));
                     fclose(fid);
             end
         end
