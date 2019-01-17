@@ -1,21 +1,14 @@
 classdef Model
-    %MODEL Parametric representation of a penetrance model as a function
-    %of the baseline effects and genotypic effects.
-    %   Class Model represents a penetrance table as a function of two
-    %   variables:
-    %     -The baseline effect, or alpha: probability of developing the
-    %     phenotype of interest when none of the phenotype-associated
-    %     alleles are present.
-    %     -The genotypic effect, or beta: additional probability linked
-    %     with each phenotype-associated allele.
-    %   The class Model provides methods to obtain numeric penetrance
-    %   tables derived from the parametric representation given as input.
+    %MODEL Abstract representation of a penetrance model as a function
+    % of two variables. This class provides methods to obtain numeric
+    % penetrance tables derived from the parametric representation given as
+    % input.
     
     properties
-        name                  % Name of the model.
-        order                 % Number of loci involved in the epistatic model.
-        penetrances           % Array of symbolic expressions, representing the epistatic model.
-        variables             % List of all variables contained in all symbolic expressions
+        name          % Name of the model.
+        order         % Number of loci involved in the epistatic model.
+        penetrances   % Array of symbolic expressions, representing the epistatic model.
+        variables     % List of all variables contained in all symbolic expressions
     end
     
     methods (Access = private, Static = true)
@@ -32,18 +25,17 @@ classdef Model
     
     methods
         function obj = Model(path)
-        % MODEL Construct an instance of this class from the given model.
-        %   M = MODEL(P) reads the model from its text representation in
-        %   file path P.
-        %
-        %   Each line of the file P represents a row of the model,
-        %   consisting of the genotype definition and the probability
-        %   associated with the given genotype, separated by (any number
-        %   of) spaces.
-        %   Probability is expressed as a function of the variables a
-        %   (representing the baseline effect) and b (represeting the
-        %   genotypic effect).
-        %   Lines starting with # (comments) will be ignored.
+            %MODEL Construct an instance of this class from the given model.
+            % M = MODEL(P) reads the model from its text representation in
+            % file path P.
+            %
+            % The input model must be formatted as a plain CSV, with each
+            % line of the file P corresponding to a row of the model. The 
+            % rows are made of the genotype definition and the probability
+            % associated with the given genotype, separated by a coma.
+            % Probability is expressed as a function of two variables.
+            % Empty lines, as well as lines starting with '#' will be
+            % ignored.
             
             [~, obj.name, ~] = fileparts(path);
             fid = fopen(path, 'r');
@@ -56,21 +48,15 @@ classdef Model
             obj.order = strlength(content(1,1)) / 2;
         end
         
-        function p = genotype_probabilities(obj, maf)
-        % GENOTYPE_PROBABILITIES Compute the probabilities associated with each genotype for a given MAF.
-        
-            p = prod(toxo.nfold([(1 - maf)^2, 2 * maf * (1 - maf), maf^2], obj.order), 2);
-        end
-        
         function pt = find_max_prevalence(obj, maf, h)
-        % FIND_MAX_PREVALENCE Compute the penetrance table of the model with the maximum admissible prevalence given its MAF and heritability.
-        %   PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
-        %   maximum admissible prevalence given the MAF and heritability
-        %   restraints.
-        %   Finding the maximum prevalence requires solving a minimization
-        %   problem, since the resulting equation system involves
-        %   non-polynomial terms and can not be solved analytically.
-
+            %FIND_MAX_PREVALENCE Compute the penetrance table of the model with the maximum admissible prevalence given its MAF and heritability.
+            % PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
+            % maximum admissible prevalence given the MAF and heritability
+            % restraints.
+            % Finding the maximum prevalence requires solving a minimization
+            % problem, since the resulting equation system involves
+            % non-polynomial terms and can not be solved analytically.
+            
             highest_degree_monomial = obj.symbolic_penetrances(end);
             bfunction = matlabFunction(rhs(isolate(highest_degree_monomial == 1, sym('b'))));
             lb = 0;
@@ -87,14 +73,14 @@ classdef Model
         end
         
         function pt = find_max_heritability(obj, maf, p)
-        % FIND_MAX_HERITABILITY Compute the penetrance table of the model with the maximum admissible heritability given its MAF and prevalence.
-        %   PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
-        %   maximum admissible heritability given the MAF and prevalence
-        %   restraints.
-        %   Finding the maximum heritability requires solving a 
-        %   minimization problem, since the resulting equation system
-        %   involves non-polynomial terms and can not be solved
-        %   analytically.
+            % FIND_MAX_HERITABILITY Compute the penetrance table of the model with the maximum admissible heritability given its MAF and prevalence.
+            %   PT = FIND_MAX_PREVALENCE(MAF, H) returns a PT instance with the
+            %   maximum admissible heritability given the MAF and prevalence
+            %   restraints.
+            %   Finding the maximum heritability requires solving a
+            %   minimization problem, since the resulting equation system
+            %   involves non-polynomial terms and can not be solved
+            %   analytically.
             
             highest_degree_monomial = obj.symbolic_penetrances(end);
             afunction = matlabFunction(rhs(isolate(highest_degree_monomial == 1, sym('a'))));
