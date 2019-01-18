@@ -7,9 +7,9 @@ classdef PTable
     properties
         order  % Number of loci involved in the penetrance table.
         maf    % Common MAF of all locis involved in the interaction.
-        vars   % Values of the two variables in the original model.
-        gp     % Genotype probability table array.
-        pt     % Penetrance table array.
+        vars   % Values of the variables present in the original model.
+        gp     % Genotype probabilities table array.
+        pt     % Penetrances table array.
     end
     
     methods (Access = private, Static = true)
@@ -29,7 +29,9 @@ classdef PTable
         end
     end
     
-    % Since MATLAB doesn't allow the definition of static variables, they have to be encapsulated inside static methods with the "persistent" definition
+    % Since MATLAB doesn't allow the definition of static variables, they
+    % have to be encapsulated inside static methods which can be accessed
+    % with no parentheses nor arguments
     methods (Static = true)
         function out = format_csv()
             out = 0;
@@ -42,10 +44,12 @@ classdef PTable
     
     methods
         function obj = PTable(model, maf, values)
-        %PT Create a penetrance table from a given Model, using the MAF and variable values desired.
-        % P = PTable(MODEL, M, A, B) creates a penetrance table P following
-        % model description MODEL and using MAF M, baseline effect A and
-        % genotypic effect B.
+        %PT Create a penetrance table from a given Model, using the MAF and
+        % variable values desired.
+        % 
+        % P = PTable(MODEL, MAF, VALUES) creates a penetrance table P fol-
+        % lowing model description MODEL and using MAF and variable values
+        % inside array VALUES.
             
             obj.order = model.order;
             obj.maf = maf;
@@ -68,13 +72,15 @@ classdef PTable
         end
         
         function write(obj, path, format)
-        %WRITE Write the penetrance table into a text file using a specific output format.
+        %WRITE Write the penetrance table into a text file using a specific
+        % output format.
+        % 
         % P.WRITE(PATH, FORMAT) writes the penetrance table P into the
         % file specified in PATH using format FORMAT. FORMAT can take any
         % of these values:
-        %   -PTable.format_paintext: text-format output file, with each row
-        %   corresponding to a genotype from the penetrance table and its
-        %   associated phenotype probability.
+        %   -PTable.format_csv: csv-like output file, with each row corre-
+        %   sponding to a genotype from the penetrance table and its asso-
+        %   ciated phenotype probability.
         %   -PTable.format_gametes: GAMETES compatible model output format.
         
             switch format
