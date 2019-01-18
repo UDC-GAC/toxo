@@ -1,8 +1,7 @@
 classdef Model
-    %MODEL Abstract representation of a penetrance model as a function of
-    % two variables. This class provides methods to obtain numeric pene-
-    % trance tables derived from the parametric representation given as
-    % input.
+    %MODEL Symbolic representation of a penetrance model as a function of
+    % two variables. This class provides methods to obtain penetrance
+    % tables derived from the parametric representation given as input.
     
     properties
         name          % Name of the model.
@@ -63,13 +62,19 @@ classdef Model
             h_constraint = obj.heritability(maf) == h;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
-            S = solve([h_constraint, max_poly == 1], obj.variables);
-            x = vpa(S.x);
-            y = vpa(S.y);
-            solutions = arrayfun(@(z, t) isreal(z) && isreal(t) && z >= 0 && t >= 0, x, y);
-            x = x(solutions);
-            y = y(solutions);
-            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, [z, t]), x, y);
+            [Sx, Sy, p, c] = solve([h_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
+            if isempty(Sx)
+                ME = MException("Model:no_solution", output.message);
+                throw(ME);
+            elseif isempty(p)
+                pt = toxo.PTable(obj, maf, [Sx, Sy]);
+            else
+                assume(c);
+                Sp = solve(Sx >= 0, Sy >=0, c);
+                x = subs(Sx, p, Sp);
+                y = subs(Sy, p, Sp);
+                pt = toxo.PTable(obj, maf, [x, y]);
+            end
         end
         
         function pt = find_max_heritability(obj, maf, p)
@@ -84,13 +89,19 @@ classdef Model
             p_constraint = obj.prevalence(maf) == p;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
-            S = solve([p_constraint, max_poly == 1], obj.variables);
-            x = vpa(S.x);
-            y = vpa(S.y);
-            solutions = arrayfun(@(z, t) isreal(z) && isreal(t) && z >= 0 && t >= 0, x, y);
-            x = x(solutions);
-            y = y(solutions);
-            pt = arrayfun(@(z, t) toxo.PTable(obj, maf, [z, t]), x, y);
+            [Sx, Sy, p, c] = solve([p_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
+            if isempty(Sx)
+                ME = MException("Model:no_solution", output.message);
+                throw(ME);
+            elseif isempty(p)
+                pt = toxo.PTable(obj, maf, [Sx, Sy]);
+            else
+                assume(c);
+                Sp = solve(Sx >= 0, Sy >=0, c);
+                x = subs(Sx, p, Sp);
+                y = subs(Sy, p, Sp);
+                pt = toxo.PTable(obj, maf, [x, y]);
+            end
         end
     end
 end
