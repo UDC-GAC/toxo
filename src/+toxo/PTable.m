@@ -40,7 +40,7 @@ classdef PTable
     
     % Since MATLAB doesn't allow the definition of static variables, they have to be encapsulated inside static methods with the "persistent" definition
     methods (Static = true)
-        function out = format_plaintext()
+        function out = format_csv()
             out = 0;
         end
         
@@ -87,13 +87,9 @@ classdef PTable
         %   -PTable.format_gametes: GAMETES compatible model output format.
         
             switch format
-                case obj.format_plaintext
-                    gt_strings = char(char(join(toxo.nfold(["AA" "Aa" "aa"], obj.order), "")) + repelem(0:obj.order - 1, 2));
-                    fid = fopen(path, 'w+');
-                    for i = 1:length(obj.pt)
-                        fprintf(fid, "%s %.12f\n", gt_strings(i, :), vpa(obj.pt(i)));
-                    end
-                    fclose(fid);
+                case obj.format_csv
+                    gt_strings = string(char(char(join(toxo.nfold(["AA" "Aa" "aa"], obj.order), "")) + repelem(0:obj.order - 1, 2)));
+                    writetable(table(gt_strings, arrayfun(@(x) sprintf("%.12f", vpa(x)), obj.pt)), path, 'WriteVariableNames', false);
                 case obj.format_gametes
                     header_template = ...
                         "Attribute names:\t%s\n" + ...
