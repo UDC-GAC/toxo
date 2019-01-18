@@ -13,15 +13,6 @@ classdef PTable
     end
     
     methods (Access = private, Static = true)
-        function n = counter()
-            persistent value;
-            if isempty(value)
-                value = 0;
-            end
-            n = value;
-            value = value + 1;
-        end
-        
         function [s] = pt_to_string_table(pt, o)
             n = length(pt) / 3;
             if o > 2
