@@ -2,7 +2,7 @@
 Toxo
 ============
 
-Toxo is a MATLAB library which provides a powerful, object-oriented implementation of penetrance table calculations for epistasis interaction models. Referencia a dos variables en el modelo. Toxo calculates the penetrance table for a given epistasis model that maximizes the heritability for a given prevalence and Minor Allele Frequency (MAF). Maximizing the prevalence is an analogous process.
+Toxo is a MATLAB library which provides a powerful, object-oriented implementation of penetrance table calculations for epistasis interaction models. Toxo calculates the penetrance table for a given epistasis model that maximizes the heritability for a given prevalence and Minor Allele Frequency (MAF). Maximizing the prevalence is an analogous process.
 
 
 Requirements
@@ -33,14 +33,26 @@ Model requirements
 In order for Toxo to calculate the values of the two variables for which the prevalence (or heritability) is maximum, two requirements must be met:
 
 1) Penetrance expressions are non-decreasing monotonic polynomials in the real positive number space. Polynomials that meet this criteria have positive partial derivatives for all real positive values of both variables.
-2) Polynomials can be sorted unequivocally in the real positive number space. This can be demonstrated analytically for all models by comparing the polynomials in pairs. As an example, the demonstration that :math:`x(1+y)^4` is greater than :math:`x(1+y)^3` for real positive numbers would be:
- 
-.. math:: 
-   
-   x(1+y)^4 &\ge x(1+y)^3 \\
-   (1+y)^4  &\ge (1+y)^3 \\
-   1+y      &\ge 1 \\
-   y        &\ge 0 \\
+2) Polynomials can be sorted unequivocally in the real positive number space. This can be demonstrated analytically for all models by comparing the polynomials in pairs. As an example, the demonstration that |e1| is greater than |e2| for real positive numbers would be:
+
+.. |e1| image:: https://latex.codecogs.com/gif.latex?x%281&plus;y%29%5E4
+   :align: bottom
+
+.. |e2| image:: https://latex.codecogs.com/gif.latex?x%281&plus;y%29%5E3
+   :align: bottom
+
+.. figure:: https://latex.codecogs.com/gif.latex?x%281&plus;y%29%5E4%20%26%5Cge%20x%281&plus;y%29%5E3
+   :align: center
+
+.. figure:: https://latex.codecogs.com/gif.latex?%281&plus;y%29%5E4%20%26%5Cge%20%281&plus;y%29%5E3
+   :align: center
+
+.. figure:: https://latex.codecogs.com/gif.latex?1&plus;y%20%26%5Cge%201
+   :align: center
+
+.. figure:: https://latex.codecogs.com/gif.latex?y%20%26%5Cge%200
+   :align: center
+
 
 Model description
 ^^^^^^^^^^^^^^^^^
