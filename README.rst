@@ -2,7 +2,7 @@
 Toxo
 =====================================
 
-Toxo is a MATLAB library which provides a powerful, object-oriented implementation of model and penetrance table operation for epistasis interaction models. Toxo is centered on bivariate epistasis models, models where the penetrance is an expression of two intervening variables. The library can obtain the penetrance table for a given epistasis model that maximizes the prevalence (or heritability) for a given heritability (or prevalence) and Minor Allele Frequency (MAF).
+Toxo is an object-oriented MATLAB library for calculating penetrance tables of any interaction order model. It is centered on bivariate epistasis models, that is, models where the penetrance is an expression of two intervening variables. The user specifies the model, its desired heritability (or prevalence) and Minor Allele Frequency (MAF) and the library maximizes the resulting table's prevalence (or heritability).
 
 Toxo includes, as an example, the `models <https://github.com/chponte/toxo/blob/master/models/>`__ proposed by Marchini *et al*. [1]_ together with a `script <https://github.com/chponte/toxo/blob/master/generate_models.m>`__ to generate penetrance tables derived from those models.
 
@@ -27,7 +27,7 @@ Installation
 Usage
 -------------------------------------
 
-Using Toxo starts with defining a model in CSV-like format. Not all models are supported by Toxo, make sure the desired model complies with the two conditions. Model variable values are then calculated, and the resulting penetrance table is written into a text file. A complete working example can be found `here <https://github.com/chponte/toxo/blob/master/generate_models.m>`__.
+Using Toxo starts with defining a model in CSV-like format. Not all models are supported by Toxo, make sure the desired model complies with the two requirements expressed below. Model variable values are then calculated, and the resulting penetrance table is written into a text file. A complete working example can be found `here <https://github.com/chponte/toxo/blob/master/generate_models.m>`__.
 
 Model requirements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -65,7 +65,7 @@ In order for Toxo to calculate the values of the two variables for which the pre
 
 Model description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Models read by Toxo are formatted in CSV-like style, where each row represents a genotype combination and, separated by a comma, its associated penetrance. The order in which the rows appear does not matter. Empty lines or lines starting with '#' (comments) are ignored.
+Models read by Toxo are formatted in CSV-like style, where each row represents a genotype combination and its associated penetrance (separated by a comma). The order in which the rows appear does not matter. Empty lines or lines starting with '#' (comments) are ignored.
 
 Genotypes are represented as two characters, each one corresponding to each of the alleles from genotype. Alleles of the same genotype use the same alphabetic letter, and the difference in capitalization encodes the minor (lowercase) and major (uppercase) allele. There is no limit on the genotype combination size.
 
@@ -109,7 +109,7 @@ Toxo implements two main classes, Model_ and PTable_, which encapsulate all the 
 
 Model
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Model is a symbolic representation of a epistasis model. It is responsible for reading the model, parsing the text file and converting the penetrance strings to symbolic expressions. It offers two methods to calculate penetrance tables which maximize the associated penetrance or heritability under certain constraints.
+Model is a symbolic representation of an epistasis model. It is responsible for reading the model, parsing the text file and converting the penetrance strings to symbolic expressions. It offers two methods to calculate penetrance tables which maximize the associated penetrance or heritability under certain constraints.
 
 Attributes
 """""""""""""""""""""""""""""""""""""
