@@ -12,19 +12,25 @@ classdef PTable
         pt     % Penetrances table array.
     end
     
-    methods (Access = private, Static = true)
-        function [s] = pt_to_string_table(pt, o)
-            n = length(pt) / 3;
-            if o > 2
-                s = toxo.PTable.pt_to_string_table(pt(1:n), o - 1) + newline + ...
-                    toxo.PTable.pt_to_string_table(pt(n + 1:2 * n), o - 1) + newline + ...
-                    toxo.PTable.pt_to_string_table(pt(2 * n + 1:end), o - 1);
-            elseif o == 2
-                s = toxo.PTable.pt_to_string_table(pt(1:n), o - 1) + ...
-                    toxo.PTable.pt_to_string_table(pt(n + 1:2 * n), o - 1) + ...
-                    toxo.PTable.pt_to_string_table(pt(2 * n + 1:end), o - 1);
-            else
-                s = join(arrayfun(@(x) sprintf("%.12f", vpa(x)), pt), ", ") + newline;
+    methods (Access = private)
+        function [s] = to_gametes(obj, fmask)
+            attributes = ['Attribute names:\t' char(join(arrayfun(@(x) sprintf("P%i", x), 0:obj.order-1), char(9))) '\n'];
+            mafs = ['Minor allele frequencies:\t' char(join(arrayfun(@(x) sprintf("%.3f", x), repmat(obj.maf, [1, obj.order])), char(9))) '\n'];
+            solutions = char(join(cellfun(@(x) sprintf(string(['%s: ' fmask '\n']), x, vpa(obj.vars(x))), obj.vars.keys()), ''));
+            prevalence = sprintf(['Prevalence: ' fmask '\n'], obj.prevalence);
+            heritability = sprintf(['Heritability: ' fmask '\n\n'], obj.heritability);
+            table = ['Table:\n\n' recursive_table(obj.pt, obj.order)];
+            s = [attributes mafs solutions prevalence heritability table];
+            
+            function s = recursive_table(pt, o)
+                n = length(pt) / 3;
+                if o > 2
+                    s = [recursive_table(pt(1:n), o - 1) '\n' recursive_table(pt(n + 1:2 * n), o - 1) '\n' recursive_table(pt(2 * n + 1:end), o - 1)];
+                elseif o == 2
+                    s = [recursive_table(pt(1:n), o - 1) recursive_table(pt(n + 1:2 * n), o - 1) recursive_table(pt(2 * n + 1:end), o - 1)];
+                else
+                    s = [char(join(arrayfun(@(x) string(sprintf(fmask, vpa(x))), pt), ", ")) '\n'];
+                end
             end
         end
     end
@@ -83,24 +89,14 @@ classdef PTable
         %   ciated phenotype probability.
         %   -PTable.format_gametes: GAMETES compatible model output format.
         
+            fmask = sprintf('%%.%if', fix(digits()/4));
             switch format
                 case obj.format_csv
                     gt_strings = string(char(char(join(toxo.nfold(["AA" "Aa" "aa"], obj.order), "")) + repelem(0:obj.order - 1, 2)));
-                    writetable(table(gt_strings, arrayfun(@(x) sprintf("%.12f", vpa(x)), obj.pt)), path, 'WriteVariableNames', false);
+                    writetable(table(gt_strings, arrayfun(@(x) sprintf(fmask, vpa(x)), obj.pt)), path, 'WriteVariableNames', false);
                 case obj.format_gametes
-                    header_template = ...
-                        "Attribute names:\t%s\n" + ...
-                        "Minor allele frequencies:\t%s\n" + ...
-                        "%s" + ...
-                        "Prevalence: %.12f\n" + ...
-                        "Heritability: %.12f\n\n" + ...
-                        "Table:\n\n" + ...
-                        "%s";
-                    names = join(arrayfun(@(x) sprintf("P%i", x), 0:obj.order-1), char(9));
-                    maf_list = join(arrayfun(@(x) sprintf("%.3f", x), repmat(obj.maf, [1, obj.order])), char(9));
-                    vars_list = join(cellfun(@(x) sprintf("%s: %.12f\n", x, obj.vars(x)), obj.vars.keys()), "");
                     fid = fopen(path, 'w+');
-                    fprintf(fid, header_template, names, maf_list, vars_list, obj.prevalence, obj.heritability, toxo.PTable.pt_to_string_table(obj.pt, obj.order));
+                    fprintf(fid, obj.to_gametes(fmask));
                     fclose(fid);
             end
         end
