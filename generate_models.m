@@ -3,10 +3,12 @@ addpath('src/');
 
 %% Penetrance table generation
 % Read all the models from models/ folder
-models = {};
-for m = dir('models')'
-    if ~ m.isdir
-        models{end + 1} = toxo.Model(fullfile(m.folder, m.name));
+model_list = dir('models')';
+model_list = model_list(arrayfun(@(x) ~x.isdir, model_list));
+models = cell([1 length(model_list)]);
+for m = 1:length(model_list)
+    if ~ model_list(m).isdir
+        models{m} = toxo.Model(fullfile(model_list(m).folder, model_list(m).name));
     end
 end
 
@@ -15,7 +17,7 @@ maf = [0.1, 0.25, 0.4];
 h = [0.1, 0.25, 0.5, 0.8];
 
 % Create the output folder
-output_folder = "output\";
+output_folder = "output";
 if ~ isfolder(output_folder)
     mkdir(output_folder);
 end
