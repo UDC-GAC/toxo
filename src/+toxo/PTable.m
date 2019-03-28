@@ -6,7 +6,7 @@ classdef PTable
     
     properties
         order  % Number of loci involved in the penetrance table.
-        maf    % Common MAF of all locis involved in the interaction.
+        mafs   % MAF associated with each loci involved in the interaction.
         vars   % Values of the variables present in the original model.
         gp     % Genotype probabilities table array.
         pt     % Penetrances table array.
@@ -15,12 +15,12 @@ classdef PTable
     methods (Access = private)
         function [s] = to_gametes(obj, fmask)
             attributes = ['Attribute names:\t' char(join(arrayfun(@(x) sprintf("P%i", x), 0:obj.order-1), char(9))) '\n'];
-            mafs = ['Minor allele frequencies:\t' char(join(arrayfun(@(x) sprintf("%.3f", x), repmat(obj.maf, [1, obj.order])), char(9))) '\n'];
-            solutions = char(join(cellfun(@(x) sprintf(string(['%s: ' fmask '\n']), x, vpa(obj.vars(x))), obj.vars.keys()), ''));
+            maf = ['Minor allele frequencies:\t' char(join(arrayfun(@(x) sprintf("%.3f", x), obj.mafs), char(9))) '\n'];
+            solution = char(join(cellfun(@(x) sprintf(string(['%s: ' fmask '\n']), x, vpa(obj.vars(x))), obj.vars.keys()), ''));
             prevalence = sprintf(['Prevalence: ' fmask '\n'], obj.prevalence);
             heritability = sprintf(['Heritability: ' fmask '\n\n'], obj.heritability);
             table = ['Table:\n\n' recursive_table(obj.pt, obj.order)];
-            s = [attributes mafs solutions prevalence heritability table];
+            s = [attributes maf solution prevalence heritability table];
             
             function s = recursive_table(pt, o)
                 n = length(pt) / 3;
@@ -49,18 +49,18 @@ classdef PTable
     end
     
     methods
-        function obj = PTable(model, maf, values)
+        function obj = PTable(model, mafs, values)
         %PT Create a penetrance table from a given Model, using the MAF and
         % variable values desired.
         % 
-        % P = PTable(MODEL, MAF, VALUES) creates a penetrance table P fol-
-        % lowing model description MODEL and using MAF and variable values
+        % P = PTable(MODEL, MAFS, VALUES) creates a penetrance table P fol-
+        % lowing model description MODEL and using MAFS and variable values
         % inside array VALUES.
             
             obj.order = model.order;
-            obj.maf = maf;
+            obj.mafs = mafs;
             obj.vars = containers.Map(arrayfun(@char, model.variables, 'uniform', 0), arrayfun(@(x) {x}, values));
-            obj.gp = toxo.genotype_probabilities(maf, model.order);
+            obj.gp = toxo.genotype_probabilities(mafs);
             obj.pt = subs(model.penetrances, model.variables, values);
         end
         
@@ -92,8 +92,8 @@ classdef PTable
             fmask = sprintf('%%.%if', fix(digits()/4));
             switch format
                 case obj.format_csv
-                    gt_strings = string(char(char(join(toxo.nfold(["AA" "Aa" "aa"], obj.order), "")) + repelem(0:obj.order - 1, 2)));
-                    writetable(table(gt_strings, arrayfun(@(x) sprintf(fmask, vpa(x)), obj.pt)), path, 'WriteVariableNames', false);
+                    s = arrayfun(@(x) {[char(x) char(x)], [char(x) lower(char(x))], [lower(char(x)) lower(char(x))]}, (0:length(obj.mafs) - 1) + 'A', 'UniformOutput', false);
+                    writetable(table(cell2mat(toxo.nfold(s)), arrayfun(@(x) sprintf(fmask, vpa(x)), obj.pt, 'UniformOutput', false)), path, 'WriteVariableNames', false);
                 case obj.format_gametes
                     fid = fopen(path, 'w+');
                     fprintf(fid, obj.to_gametes(fmask));

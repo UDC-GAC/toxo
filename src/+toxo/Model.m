@@ -11,16 +11,16 @@ classdef Model
     end
     
     methods (Access = private)
-        function p = prevalence(obj, maf, gp)
+        function p = prevalence(obj, mafs, gp)
             if nargin < 3
-                gp = toxo.genotype_probabilities(maf, obj.order);
+                gp = toxo.genotype_probabilities(mafs);
             end
             p = sum(obj.penetrances .* gp);
         end
         
-        function h = heritability(obj, maf)
-            gp = toxo.genotype_probabilities(maf, obj.order);
-            p = obj.prevalence(maf, gp);
+        function h = heritability(obj, mafs)
+            gp = toxo.genotype_probabilities(mafs);
+            p = obj.prevalence(mafs, gp);
             h = sum((obj.penetrances - p).^2 .* gp) / (p * (1 - p));
         end
     end
@@ -50,7 +50,7 @@ classdef Model
             obj.order = strlength(content(1,1)) / 2;
         end
         
-        function pt = find_max_prevalence(obj, maf, h)
+        function pt = find_max_prevalence(obj, mafs, h)
             %FIND_MAX_PREVALENCE Calculate the penetrance table(s) of the
             % model with the maximum admissible prevalence given its MAF
             % and heritability.
@@ -59,7 +59,7 @@ classdef Model
             % tables (as PTable objects) that maximize the prevalence, 
             % given the MAF and heritability constraints.
             
-            h_constraint = obj.heritability(maf) == h;
+            h_constraint = obj.heritability(mafs) == h;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
             [Sx, Sy, p, c] = solve([h_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
@@ -67,17 +67,17 @@ classdef Model
                 ME = MException("Model:no_solution", output.message);
                 throw(ME);
             elseif isempty(p)
-                pt = toxo.PTable(obj, maf, [Sx, Sy]);
+                pt = toxo.PTable(obj, mafs, [Sx, Sy]);
             else
                 assume(c);
                 Sp = solve(Sx >= 0, Sy >=0, c);
                 x = subs(Sx, p, Sp);
                 y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, maf, [x, y]);
+                pt = toxo.PTable(obj, mafs, [x, y]);
             end
         end
         
-        function pt = find_max_heritability(obj, maf, p)
+        function pt = find_max_heritability(obj, mafs, p)
             %FIND_MAX_HERITABILITY Calculate the penetrance table(s) of the
             % model with the maximum admissible heritability given its MAF
             % and prevalence.
@@ -86,7 +86,7 @@ classdef Model
             % trance tables (as PTable objects) that maximize the heri-
             % tability, given the MAF and prevalence constraints.
             
-            p_constraint = obj.prevalence(maf) == p;
+            p_constraint = obj.prevalence(mafs) == p;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
             [Sx, Sy, p, c] = solve([p_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
@@ -94,13 +94,13 @@ classdef Model
                 ME = MException("Model:no_solution", output.message);
                 throw(ME);
             elseif isempty(p)
-                pt = toxo.PTable(obj, maf, [Sx, Sy]);
+                pt = toxo.PTable(obj, mafs, [Sx, Sy]);
             else
                 assume(c);
                 Sp = solve(Sx >= 0, Sy >=0, c);
                 x = subs(Sx, p, Sp);
                 y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, maf, [x, y]);
+                pt = toxo.PTable(obj, mafs, [x, y]);
             end
         end
     end
