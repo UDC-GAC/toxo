@@ -80,13 +80,12 @@ classdef Model
                 ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
                 throwAsCaller(ME);
             elseif isempty(p)
-                pt = toxo.PTable(obj, mafs, [Sx, Sy]);
+                pt = toxo.PTable(obj, [Sx, Sy]);
             else
-                assume(c);
-                Sp = solve(Sx, Sy, c);
+                Sp = solve(Sx >= 0, Sy >= 0, c);
                 x = subs(Sx, p, Sp);
                 y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, mafs, [x, y]);
+                pt = toxo.PTable(obj, [x, y]);
             end
         end
         
@@ -109,13 +108,13 @@ classdef Model
                 ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
                 throwAsCaller(ME);
             elseif isempty(p)
-                pt = toxo.PTable(obj, mafs, [Sx, Sy]);
+                pt = toxo.PTable(obj, [Sx, Sy]);
             else
                 assume(c);
                 Sp = solve(Sx >= 0, Sy >=0, c);
                 x = subs(Sx, p, Sp);
                 y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, mafs, [x, y]);
+                pt = toxo.PTable(obj, [x, y]);
             end
         end
     end
