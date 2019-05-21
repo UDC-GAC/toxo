@@ -59,13 +59,18 @@ classdef Model
             % tables (as PTable objects) that maximize the prevalence, 
             % given the MAF and heritability constraints.
             
+            if length(obj.variables) ~= 2
+                ME = MException("toxo:Model:unsupported", "Toxo does not support models with %i variables.", length(obj.variables));
+                throwAsCaller(ME);
+            end
+            
             h_constraint = obj.heritability(mafs) == h;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
             [Sx, Sy, p, c] = solve([h_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
             if isempty(Sx)
-                ME = MException("Model:no_solution", output.message);
-                throw(ME);
+                ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
+                throwAsCaller(ME);
             elseif isempty(p)
                 pt = toxo.PTable(obj, mafs, [Sx, Sy]);
             else
@@ -86,13 +91,18 @@ classdef Model
             % trance tables (as PTable objects) that maximize the heri-
             % tability, given the MAF and prevalence constraints.
             
+            if length(obj.variables) ~= 2
+                ME = MException("toxo:Model:unsupported", "Toxo does not support models with %i variables.", length(obj.variables));
+                throwAsCaller(ME);
+            end
+            
             p_constraint = obj.prevalence(mafs) == p;
             [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
             max_poly = obj.penetrances(i);
             [Sx, Sy, p, c] = solve([p_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
             if isempty(Sx)
-                ME = MException("Model:no_solution", output.message);
-                throw(ME);
+                ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
+                throwAsCaller(ME);
             elseif isempty(p)
                 pt = toxo.PTable(obj, mafs, [Sx, Sy]);
             else
