@@ -11,6 +11,17 @@ classdef Model
     end
     
     methods (Access = private)
+        function m = max_penetrance(obj)
+            p = transpose(unique(obj.penetrances(polynomialDegree(obj.penetrances) > 0)));
+            m = p(1);
+            for e = p(2:end)
+                [Sx, ~] = solve([obj.variables >= 0, p >= 0, p <= 1, m > e], 'Real', true);
+                if isempty(Sx)
+                    m = e;
+                end
+            end
+        end
+        
         function p = prevalence(obj, mafs, gp)
             if nargin < 3
                 gp = toxo.genotype_probabilities(mafs);
@@ -29,13 +40,13 @@ classdef Model
         function obj = Model(path)
             %MODEL Construct an instance of this class from the given
             % model.
-            % 
+            %
             % M = MODEL(P) reads the model from its text representation in
             % file path P. The input model must be formatted as a plain
-            % CSV, with eachline of the file P corresponding to a row of 
+            % CSV, with eachline of the file P corresponding to a row of
             % the model. The rows are made of the genotype definition and
             % the probability associated with the given genotype, separated
-            % by a coma. Probability is expressed as a function of two 
+            % by a coma. Probability is expressed as a function of two
             % variables, represented as alphabetical characters. Empty
             % lines, as well as lines starting with '#' will be ignored.
             
@@ -56,7 +67,7 @@ classdef Model
             % and heritability.
             %
             % PT = FIND_MAX_PREVALENCE(MAF, H) returns a list of penetrance
-            % tables (as PTable objects) that maximize the prevalence, 
+            % tables (as PTable objects) that maximize the prevalence,
             % given the MAF and heritability constraints.
             
             if length(obj.variables) ~= 2
@@ -64,10 +75,7 @@ classdef Model
                 throwAsCaller(ME);
             end
             
-            h_constraint = obj.heritability(mafs) == h;
-            [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
-            max_poly = obj.penetrances(i);
-            [Sx, Sy, p, c] = solve([h_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
+            [Sx, Sy, p, c] = solve([obj.variables >= 0, obj.heritability(mafs) == h, obj.max_penetrance() == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
             if isempty(Sx)
                 ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
                 throwAsCaller(ME);
@@ -75,7 +83,7 @@ classdef Model
                 pt = toxo.PTable(obj, mafs, [Sx, Sy]);
             else
                 assume(c);
-                Sp = solve(Sx >= 0, Sy >=0, c);
+                Sp = solve(Sx, Sy, c);
                 x = subs(Sx, p, Sp);
                 y = subs(Sy, p, Sp);
                 pt = toxo.PTable(obj, mafs, [x, y]);
@@ -86,7 +94,7 @@ classdef Model
             %FIND_MAX_HERITABILITY Calculate the penetrance table(s) of the
             % model with the maximum admissible heritability given its MAF
             % and prevalence.
-            % 
+            %
             % PT = FIND_MAX_HERITABILITY(MAF, P) returns a list of pene-
             % trance tables (as PTable objects) that maximize the heri-
             % tability, given the MAF and prevalence constraints.
@@ -96,10 +104,7 @@ classdef Model
                 throwAsCaller(ME);
             end
             
-            p_constraint = obj.prevalence(mafs) == p;
-            [~, i] = max(subs(obj.penetrances, obj.variables, randi(2^53-1, size(obj.variables))));
-            max_poly = obj.penetrances(i);
-            [Sx, Sy, p, c] = solve([p_constraint, max_poly == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
+            [Sx, Sy, p, c] = solve([obj.variables >= 0, obj.prevalence(mafs) == p, obj.max_penetrance() == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
             if isempty(Sx)
                 ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
                 throwAsCaller(ME);
