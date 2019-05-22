@@ -80,11 +80,13 @@ classdef PTable
         
         function mp = marginal_penetrances(obj, mafs)
             mp = sym(zeros(obj.order, 3));
-            rel_penetrances = toxo.genotype_probabilities(mafs) .* obj.pt;
-            for p = 1:length(obj.pt)
-                for i = 1:obj.order
-                    gt = mod(floor((p - 1) / 3^(obj.order - i)), 3) + 1; % index / 3^(order - snp_index) mod 3, with index starting at 0
-                    mp(i, gt) = mp(i, gt) + rel_penetrances(p);
+            gp = toxo.genotype_probabilities(mafs);
+            sp = arrayfun(@toxo.genotype_probabilities, mafs, 'UniformOutput', false);
+            
+            for i = 1:obj.order
+                for j = 1:length(obj.pt)
+                    geno = mod(fix((j - 1) / 3^(obj.order - i)), 3) + 1;
+                    mp(i, geno) = mp(i, geno) + obj.pt(j) * gp(j) / sp{i}(geno);
                 end
             end
             mp = vpa(mp);
