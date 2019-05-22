@@ -78,6 +78,18 @@ classdef PTable
             h = vpa(sum((obj.pt - p).^2 .* gp) / (p * (1 - p)));
         end
         
+        function mp = marginal_penetrances(obj, mafs)
+            mp = sym(zeros(obj.order, 3));
+            rel_penetrances = toxo.genotype_probabilities(mafs) .* obj.pt;
+            for p = 1:length(obj.pt)
+                for i = 1:obj.order
+                    gt = mod(floor((p - 1) / 3^(obj.order - i)), 3) + 1; % index / 3^(order - snp_index) mod 3, with index starting at 0
+                    mp(i, gt) = mp(i, gt) + rel_penetrances(p);
+                end
+            end
+            mp = vpa(mp);
+        end
+        
         function write(obj, path, format, varargin)
             %WRITE Write the penetrance table into a text file using a specific
             % output format.
