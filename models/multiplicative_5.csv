@@ -166,7 +166,7 @@ AabbccDdEe, x*(1+y)^4
 AabbccDdee, x*(1+y)^8
 AabbccddEE, x
 AabbccddEe, x*(1+y)^8
-Aabbccddee, x*(1+y)6
+Aabbccddee, x*(1+y)^16
 aaBBCCDDEE, x
 aaBBCCDDEe, x
 aaBBCCDDee, x
@@ -220,7 +220,7 @@ aaBbccDdEe, x*(1+y)^4
 aaBbccDdee, x*(1+y)^8
 aaBbccddEE, x
 aaBbccddEe, x*(1+y)^8
-aaBbccddee, x*(1+y)6
+aaBbccddee, x*(1+y)^16
 aabbCCDDEE, x
 aabbCCDDEe, x
 aabbCCDDee, x
@@ -238,13 +238,13 @@ aabbCcDdEe, x*(1+y)^4
 aabbCcDdee, x*(1+y)^8
 aabbCcddEE, x
 aabbCcddEe, x*(1+y)^8
-aabbCcddee, x*(1+y)6
+aabbCcddee, x*(1+y)^16
 aabbccDDEE, x
 aabbccDDEe, x
 aabbccDDee, x
 aabbccDdEE, x
 aabbccDdEe, x*(1+y)^8
-aabbccDdee, x*(1+y)6
+aabbccDdee, x*(1+y)^16
 aabbccddEE, x
-aabbccddEe, x*(1+y)6
+aabbccddEe, x*(1+y)^16
 aabbccddee, x*(1+y)^32
