@@ -22,17 +22,34 @@ classdef Model
             end
         end
         
-        function p = prevalence(obj, mafs, gp)
-            if nargin < 3
-                gp = toxo.genotype_probabilities(mafs);
+        function [x,y] = solve(obj, varargin)
+            assume(in(obj.variables(1), 'Real') & obj.variables(1) >= 0);
+            assume(in(obj.variables(2), 'Real') & obj.variables(2) >= 0);
+            [Sx, Sy, par, cond] = solve([varargin{:}], obj.variables, 'ReturnConditions', true);
+            if isempty(Sx)
+                ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
+                throwAsCaller(ME);
+            elseif isempty(par)
+                x = Sx;
+                y = Sy;
+            else
+                % MATLAB does not offer methods to catch warnings, hence it
+                % has to be done like this
+                lastwarn('');
+                warning('off', 'symbolic:solve:SolutionsDependOnConditions');
+                warning('off', 'symbolic:solve:ParametrizedFamily');
+                S = solve(cond, par);
+                warning('on', 'symbolic:solve:SolutionsDependOnConditions');
+                warning('on', 'symbolic:solve:ParametrizedFamily');
+                [~, wid] = lastwarn();
+                if strcmp(wid, 'symbolic:solve:SolutionsDependOnConditions') || strcmp(wid, 'symbolic:solve:ParametrizedFamily')
+                    ME = MException("toxo:Model:incapable", "Could not find a solution to the problem defined.");
+                    throwAsCaller(ME);
+                else
+                    x = subs(Sx, par, S);
+                    y = subs(Sy, par, S);
+                end
             end
-            p = sum(obj.penetrances .* gp);
-        end
-        
-        function h = heritability(obj, mafs)
-            gp = toxo.genotype_probabilities(mafs);
-            p = obj.prevalence(mafs, gp);
-            h = sum((obj.penetrances - p).^2 .* gp) / (p * (1 - p));
         end
     end
     
@@ -75,17 +92,15 @@ classdef Model
                 throwAsCaller(ME);
             end
             
-            [Sx, Sy, p, c] = solve([obj.variables >= 0, obj.heritability(mafs) == h, obj.max_penetrance() == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
-            if isempty(Sx)
-                ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
-                throwAsCaller(ME);
-            elseif isempty(p)
-                pt = toxo.PTable(obj, [Sx, Sy]);
-            else
-                Sp = solve(Sx >= 0, Sy >= 0, c);
-                x = subs(Sx, p, Sp);
-                y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, [x, y]);
+            c1 = heritability(mafs) == h;
+            c2 = obj.max_penetrance() == 1;
+            [x, y] = obj.solve(c1, c2);
+            pt = toxo.PTable(obj, [x, y]);
+            
+            function h = heritability(mafs)
+                gp = toxo.genotype_probabilities(mafs);
+                p = sum(obj.penetrances .* gp);
+                h = sum((obj.penetrances - p).^2 .* gp) / (p * (1 - p));
             end
         end
         
@@ -103,18 +118,14 @@ classdef Model
                 throwAsCaller(ME);
             end
             
-            [Sx, Sy, p, c] = solve([obj.variables >= 0, obj.prevalence(mafs) == p, obj.max_penetrance() == 1], obj.variables, 'Real', true, 'ReturnConditions', true);
-            if isempty(Sx)
-                ME = MException("toxo:Model:incompatible", "There is no solution to the problem defined.");
-                throwAsCaller(ME);
-            elseif isempty(p)
-                pt = toxo.PTable(obj, [Sx, Sy]);
-            else
-                assume(c);
-                Sp = solve(Sx >= 0, Sy >=0, c);
-                x = subs(Sx, p, Sp);
-                y = subs(Sy, p, Sp);
-                pt = toxo.PTable(obj, [x, y]);
+            c1 = prevalence(mafs) == p;
+            c2 = obj.max_penetrance() == 1;
+            [x, y] = obj.solve(c1, c2);
+            pt = toxo.PTable(obj, [x, y]);
+            
+            function p = prevalence(mafs)
+                gp = toxo.genotype_probabilities(mafs);
+                p = sum(obj.penetrances .* gp);
             end
         end
     end
