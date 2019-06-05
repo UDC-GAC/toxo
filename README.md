@@ -116,71 +116,15 @@ pt.write(output, toxo.PTable.format_csv);
 
 Toxo implements two main classes, **Model** and **PTable**, which encapsulate all the functionality of the library:
 
-<div>
-<table><dl>
-  <tr><td>
-    <dt><b>Model</b></dt>
-    <dd>Symbolic representation of an epistasis model. It provides methods to find penetrance tables according to it.</dd>
-  </td></tr>
-  <tr><td>
-    <dt>+name: char</dt>
-    <dd>The name of the model as appears in its file name.</dd>
-    <dt>+order: double</dt>
-    <dd>The number of locus invoved in the epistasis relationship.</dd>
-    <dt>+penetrances: sym</dt>
-    <dd>Sorted array of symbolic penetrance expressions.</dd>
-    <dt>+variables: sym</dt>
-    <dd>Array containing the symbolic variables used throughout the table.</dd>
-  </td></tr>
-  <tr><td>
-    <dt>«constructor»+Model(path: char)</dt>
-    <dd>Class constructor, responsible for reading the epistasis model from the given path.</dd>
-    <dt>-max_penetrance(): sym</dt>
-    <dd>Returns the largest polynomial from all penetrance expressions, for any real and possitive value of the two variables.</dd>
-    <dt>-solve(varargin: sym): sym</dt>
-    <dd>Solve the equation system made of the provided equations.</dd>
-    <dt>+find_max_prevalence(mafs: double, h: double): PTable</dt>
-    <dd>Finds the table whose prevalence is maximum for the given MAFs and heritability, and returns it as a PTable object.</dd>
-    <dt>+find_max_heritability(mafs: double, p: double): PTable</dt>
-    <dd>Finds the table whose heritability is maximum for the given MAFs and prevalence, and returns it as a PTable object.</dd>
-  </td></tr>
-</dl></table>
-</div>
+| Model                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **+name**: *char*<br/>The name of the model as appears in its file name.<br/>**+order**: *double*<br/>    The number of locus invoved in the epistasis relationship.<br/>**+penetrances**: *sym*<br/>    Sorted array of symbolic penetrance expressions.<br/>**+variables**: *sym*<br/>    Array containing the symbolic variables used throughout the table.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **«constructor»+Model**(path: *char*)<br/>    Class constructor, responsible for reading the epistasis model from the given path.<br/>**-max_penetrance**(): *sym*<br/>    Returns the largest polynomial from all penetrance expressions, for any real and possitive value of the two variables.<br/>**-solve**(varargin: *sym*): *sym*<br/>    Solve the equation system made of the provided equations.<br/>**+find_max_prevalence**(mafs: *double*, h: *double*): *PTable*<br/>    Finds the table whose prevalence is maximum for the given MAFs and heritability, and returns it as a PTable object.<br/>**+find_max_heritability**(mafs: *double*, p: *double*): *PTable*<br/>    Finds the table whose heritability is maximum for the given MAFs and prevalence, and returns it as a PTable object. |
 
-<div>
-<table><dl>
-  <tr><td>
-    <dt><b>PTable</b></dt>
-    <dd>Symbolic representation of a penetrance table. This class provides methods to calculate several metrics from the table, as well as a method to write it to a file using different formats.</dd>
-  </td></tr>
-  <tr><td>
-    <dt><u>+format_csv: double = 0</u></dt>
-    <dd>Static constant, storing the CSV format code for the write method.</dd>
-    <dt><u>+format_gametes: double = 0</u></dt>
-    <dd>Static constant, storing the GAMETES format code for the write method.</dd>
-    <dt>+order: double</dt>
-    <dd>The number of locus invoved in the epistasis relationship.</dd>
-    <dt>+vars: sym</dt>
-    <dd>Struct containing the original variable names and its value.</dd>
-    <dt>+pt: sym</dt>
-    <dd>Array of symbolic values representing the prenetrance table.</dd>
-  </td></tr>
-  <tr><td>
-    <dt>«constructor»+PTable(model: Model, values: double)</dt>
-    <dd>Class constructor, creates a penetrance table from a Model and its variables values.</dd>
-    <dt>-to_gametes(fmask: char, mafs: double): char</dt>
-    <dd>Returns a char array containing the table description, using the GAMETES format.</dd>
-    <dt>+prevalence(mafs: double): double</dt>
-    <dd>Returns the prevalence of the table.</dd>
-    <dt>+heritability(mafs: double): double</dt>
-    <dd>Returns the heritability of the table.</dd>
-    <dt>+marginal_penetrances(mafs: double): double</dt>
-    <dd>Returns the marginal penetrance of each allele from every locus.</dd>
-    <dt>+write(path: char, format: double, varargin)</dt>
-    <dd>Writes the table to the specified file using a specific format. Depending on the format, additional arguments may be provided.</dd>
-  </td></tr>
-</dl></table>
-</div>
+| PTable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <u>**+format_csv**: *double* = 0</u><br/>    Static constant, storing the CSV format code for the write method.<br/><u>**+format_gametes**: *double* = 0</u><br/>    Static constant, storing the GAMETES format code for the write method.<br/>**+order**: *double*<br/>    The number of locus invoved in the epistasis relationship.<br/>**+vars**: *sym*<br/>    Struct containing the original variable names and its value.<br/>**+pt**: *sym*<br/>    Array of symbolic values representing the prenetrance table.                                                                                                                                                                                                                                                                                                              |
+| **«constructor»+PTable**(model: *Model*, values: *double*)<br/>    Class constructor, creates a penetrance table from a Model and its variables values.<br/>**-to_gametes**(fmask: *char*, mafs: *double*): *char*<br/>    Returns a char array containing the table description, using the GAMETES format.<br/>**+prevalence**(mafs: *double*): *double*<br/>    Returns the prevalence of the table.<br/>**+heritability**(mafs: *double*): *double*<br/>    Returns the heritability of the table.<br/>**+marginal_penetrances**(mafs: *double*): *double*<br/>    Returns the marginal penetrance of each allele from every locus.<br/>**+write**(path: *char*, format: *double*, varargin)<br/>    Writes the table to the specified file using a specific format. Depending on the format, additional arguments may be provided. |
 
 ## 5. Troubleshooting
 
