@@ -6,21 +6,27 @@ Toxo does not generate population samples, and is intended to be used together w
 
 Toxo includes, as examples, two MATLAB scripts:
 
-1. [calculate_tables.m](http): calculates the penetrance tables of the additive, multiplicative and threshold third and fourth order models, for a number of MAF and heritability combinations.
+1. [calculate_tables.m](examples/calculate_tables.m): calculates the penetrance tables of the additive, multiplicative and threshold third and fourth order models, for a number of MAF and heritability combinations.
 
-2. [usage_example.m](http): calculates a penetrance table of the 2-way additive model using MAF = 0.25 and h² = 0.2, saves the table using GAMETES format, and calls GAMETES with the previous table to generate population samples.
+2. [usage_example.m](examples/usage_example.m): calculates a penetrance table of the 2-way additive model using MAF = 0.25 and h² = 0.2, saves the table using GAMETES format, and calls GAMETES with the previous table to generate population samples.
+
+---
 
 ## Table of contents
 
-1. [Requirements.](https://github.com/chponte/toxo#requirements)
+1. [Requirements.](#1-requirements)
 
-2. [Contents of this repository.](https://github.com/chponte/toxo#contents-of-this-repository)
+2. [Contents of this repository.](#2-contents-of-this-repository)
 
-3. [Usage.](https://github.com/chponte/toxo#usage)
+3. [Usage.](#3-usage)
 
-4. [Class documentation.](https://github.com/chponte/toxo#class-documentation)
+4. [Class documentation.](#4-classes-documentation)
 
-5. [Troubleshooting.](https://github.com/chponte/toxo#troubleshooting)
+5. [Troubleshooting.](#5-troubleshooting)
+
+6. [Acknowledgements.](#6-acknowledgements)
+
+---
 
 ## 1. Requirements
 
@@ -28,7 +34,7 @@ Toxo includes, as examples, two MATLAB scripts:
 
 ## 2. Contents of this repository
 
-- `models/` [Marchini's models](https://doi.org/10.1038/ng1537) (generalized from 2nd to 8th order) that can be used together with Toxo.
+- `models/` [Marchini's models](https://doi.org/10.1038/ng1537) (generalized to 3rd-8th order) that can be used together with Toxo.
 
 - `src/` Source code of the library, to be included in MATLAB' s path.
 
@@ -42,11 +48,15 @@ Toxo includes, as examples, two MATLAB scripts:
 
 ### Installation
 
-1. Download the latest Toxo release from `here <https://github.com/chponte/toxo/releases/latest>`__.
+1. Download the latest Toxo release from [here](https://github.com/chponte/toxo/releases/latest).
 
 2. Unzip the contents of the file.
 
-3. Add the `src/` folder into your MATLAB environment.: .. code:: matlab addpath('path/to/src/folder');
+3. Add the `src/` folder into your MATLAB environment:
+   
+   ```matlab
+   addpath('path/to/src/folder');
+   ```
 
 ### Using Toxo
 
@@ -182,7 +192,8 @@ The MAF and prevalence (or heritability) combination that you have specified lea
 
 The model that you are specifying may be too complex for the MATLAB's solver to process. This may be the case if, for example, your model contains big exponents (>32).
 
-If you are having trouble using Toxo, encounter any error or would like to see some additional functionality implemented, feel free to open an `Issue <https://github.com/chponte/toxo/issues>`_.
+If you are having trouble using Toxo, encounter any error or would like to see some additional functionality implemented, feel free to open an [Issue](https://github.com/chponte/toxo/issues).
 
+## 6. Acknowledgements
 
--------------------------------------
+Thanks to María J. Martín and Jorge González-Domínguez for their supervision of the project and writting of the article.
