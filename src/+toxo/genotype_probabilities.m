@@ -1,7 +1,8 @@
-function [p] = genotype_probabilities(maf, order)
-% GENOTYPE_PROBABILITIES Compute the probabilities associated with each genotype for a given order and MAF.
-m = sym(maf);
-M = 1 - m;
-p = prod(toxo.nfold([M^2, 2 * M * m, m^2], order), 2);
-end
+function [p] = genotype_probabilities(mafs)
+% GENOTYPE_PROBABILITIES Compute the probabilities associated with all genotype combinations given each MAF.
 
+m = sym(mafs);
+M = 1 - m;
+s = arrayfun(@(m, M) {[M^2, 2 * M * m, m^2]}, m, M);
+p = prod(toxo.nfold(s), 2);
+end
