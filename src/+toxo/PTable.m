@@ -1,13 +1,10 @@
 classdef PTable
-    %PTable Numeric representation of a penetrance table. This class pro-
-    % vides methods to calculate its associated penetrance and heritabi-
-    % lity, as well as a method to write the table to a file in several
-    % formats.
+    %PTable Symbolic representation of a penetrance table.
     
     properties
-        order  % Number of loci involved in the penetrance table.
-        vars   % Values of the variables present in the original model.
-        pt     % Penetrances table array.
+        order  % Number of locus defined by the penetrance table.
+        vars   % Values for the variables present in the original model.
+        pt     % Array of symbolic penetrances values.
     end
     
     methods (Access = private)
@@ -49,12 +46,11 @@ classdef PTable
     
     methods
         function obj = PTable(model, values)
-            %PT Create a penetrance table from a given Model, using the MAF and
-            % variable values desired.
+            %PTable Create a penetrance table from a given Model and its variable values.
             %
-            % P = PTable(MODEL, MAFS, VALUES) creates a penetrance table P fol-
-            % lowing model description MODEL and using MAFS and variable values
-            % inside array VALUES.
+            % PT = PTable(MODEL, VALUES) 
+            %   MODEL: Model    Model from which to create the penetrance table.
+            %   VALUES: sym     Value for each of the variables represented in MODEL.
             
             obj.order = model.order;
             obj.vars = struct(char(model.variables(1)), values(1), char(model.variables(2)), values(2));
@@ -63,6 +59,11 @@ classdef PTable
         
         function p = prevalence(obj, mafs, gp)
             %PREVALENCE Compute the prevalence of the penetrance table.
+            
+            % P = pt.prevalence(MAFS)
+            %   MAFS: double    MAF of each locus.
+            %   P: double       Prevalence value.
+            
             if nargin < 3
                 gp = toxo.genotype_probabilities(mafs);
             end
@@ -72,6 +73,10 @@ classdef PTable
         
         function h = heritability(obj, mafs)
             %HERITABILITY Compute the heritability of the penetrance table.
+            %
+            % H = pt.heritability(MAFS)
+            %   MAFS: double    MAF of each locus.
+            %   H: double       Heritability value.
             
             gp = toxo.genotype_probabilities(mafs);
             p = obj.prevalence(mafs, gp);
@@ -79,6 +84,11 @@ classdef PTable
         end
         
         function mp = marginal_penetrances(obj, mafs)
+            %MARGINAL_PENETRANCES Compute the marginal penetrance of the three alleles for every locus of the table.
+            %
+            % MP = pt.marginal_penetrances(MAFS)
+            %   MAFS: double    MAF of each locus.
+            %   MP: double      Array of the three marginal penetrances for every locus of the table.
             mp = sym(zeros(obj.order, 3));
             gp = toxo.genotype_probabilities(mafs);
             sp = arrayfun(@toxo.genotype_probabilities, mafs, 'UniformOutput', false);
@@ -93,16 +103,15 @@ classdef PTable
         end
         
         function write(obj, path, format, varargin)
-            %WRITE Write the penetrance table into a text file using a specific
-            % output format.
+            %WRITE Write the penetrance table into a file.
             %
-            % P.WRITE(PATH, FORMAT) writes the penetrance table P into the
-            % file specified in PATH using format FORMAT. FORMAT can take any
-            % of these values:
-            %   -PTable.format_csv: csv-like output file, with each row corre-
-            %   sponding to a genotype from the penetrance table and its asso-
-            %   ciated phenotype probability.
-            %   -PTable.format_gametes: GAMETES compatible model output format.
+            % pt.write(PATH, FORMAT, VARARGIN)
+            %   PATH: char      File in which to write the penetrance table.
+            %   FORMAT: double  Format to use.
+            %   VARARGIN        Additional parameters dependant of the format selected.
+            %
+            % format_csv: does not require any additional parameters.
+            % format_gametes: requires the MAFs of the locus.
             
             fmask = sprintf('%%.%if', fix(digits()/4));
             switch format

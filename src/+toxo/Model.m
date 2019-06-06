@@ -1,13 +1,11 @@
 classdef Model
-    %MODEL Symbolic representation of a penetrance model as a function of
-    % two variables. This class provides methods to obtain penetrance
-    % tables derived from the parametric representation given as input.
+    %MODEL Symbolic representation of a epistasis model.
     
     properties
         name          % Name of the model.
-        order         % Number of loci involved in the epistatic model.
+        order         % Number of locus defined in the model.
         penetrances   % Array of symbolic expressions, representing the epistatic model.
-        variables     % List of all variables contained in all symbolic expressions
+        variables     % List of symbolic variables used throughout the model.
     end
     
     methods (Access = private)
@@ -55,8 +53,7 @@ classdef Model
     
     methods
         function obj = Model(path)
-            %MODEL Construct an instance of this class from the given
-            % model.
+            %MODEL Construct an instance of this class from a given model.
             %
             % M = MODEL(P) reads the model from its text representation in
             % file path P. The input model must be formatted as a plain
@@ -79,13 +76,12 @@ classdef Model
         end
         
         function pt = find_max_prevalence(obj, mafs, h)
-            %FIND_MAX_PREVALENCE Calculate the penetrance table(s) of the
-            % model with the maximum admissible prevalence given its MAF
-            % and heritability.
+            %FIND_MAX_PREVALENCE Calculate the penetrance table of the model whose prevalence is maximum given its MAFs and heritability.
             %
-            % PT = FIND_MAX_PREVALENCE(MAF, H) returns a list of penetrance
-            % tables (as PTable objects) that maximize the prevalence,
-            % given the MAF and heritability constraints.
+            % PT = find_max_prevalence(MAFS, H)
+            %   MAFS: double. Array of doubles representing the MAF of each locus.
+            %   H:    double. Heritability of the table.
+            %   PT:   PTable. Penetrance table obtained.
             
             if length(obj.variables) ~= 2
                 ME = MException("toxo:Model:unsupported", "Toxo does not support models with %i variables.", length(obj.variables));
@@ -105,13 +101,12 @@ classdef Model
         end
         
         function pt = find_max_heritability(obj, mafs, p)
-            %FIND_MAX_HERITABILITY Calculate the penetrance table(s) of the
-            % model with the maximum admissible heritability given its MAF
-            % and prevalence.
+            %FIND_MAX_HERITABILITY Calculate the penetrance table of the model whose heritability is maximum given its MAFs and prevalence.
             %
-            % PT = FIND_MAX_HERITABILITY(MAF, P) returns a list of pene-
-            % trance tables (as PTable objects) that maximize the heri-
-            % tability, given the MAF and prevalence constraints.
+            % PT = find_max_heritability(MAFS, P)
+            %   MAFS: double. Array of doubles representing the MAF of each locus.
+            %   P:    double. Prevalence of the table.
+            %   PT:   PTable. Penetrance table obtained.
             
             if length(obj.variables) ~= 2
                 ME = MException("toxo:Model:unsupported", "Toxo does not support models with %i variables.", length(obj.variables));
