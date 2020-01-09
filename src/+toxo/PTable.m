@@ -46,6 +46,22 @@ classdef PTable
             end
             s = strjoin([freq_header; freq; pentable_header; pentable], '');
         end 
+        
+        function [s] = to_hapsample(obj, fmask, mafs)
+            snp_header = repmat("", obj.order + 1, 1);
+            snp_header(1) = [int2str(obj.order) newline];
+            for i = 1:obj.order
+                snp_header(i + 1) = sprintf('rs%0.7i\n', i);
+            end
+            prevalence = sprintf([fmask '\n'], obj.prevalence(mafs));
+            format = ['AG' newline];
+            pts = flip(vpa(obj.pt));
+            penetrances = repmat("", length(pts), 1);
+            for i = 1:length(penetrances)
+                penetrances(i) = sprintf([fmask '\n'], pts(i));
+            end
+            s = strjoin([snp_header; prevalence; format; penetrances], '');
+        end
     end
     
     % Since MATLAB doesn't allow the definition of static variables, they
@@ -62,6 +78,10 @@ classdef PTable
         
         function out = format_genomesimla()
             out = 2;
+        end
+        
+        function out = format_hapsample()
+            out = 3;
         end
     end
     
@@ -148,6 +168,10 @@ classdef PTable
                 case obj.format_genomesimla
                     fid = fopen(path, 'w+');
                     fwrite(fid, obj.to_genomesimla(fmask, varargin{1}));
+                    fclose(fid);
+                case obj.format_hapsample
+                    fid = fopen(path, 'w+');
+                    fwrite(fid, obj.to_hapsample(fmask, varargin{1}));
                     fclose(fid);
             end
         end
