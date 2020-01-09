@@ -29,6 +29,23 @@ classdef PTable
                 end
             end
         end
+        
+        function [s] = to_genomesimla(obj, fmask, mafs)
+            freq_header = ['FREQ_THRESHOLD 0.01' newline];
+            freq = repmat("", length(mafs) * 2, 1);
+            for i = 1:length(mafs)
+                freq((i-1) * 2 + 1) = sprintf(['FREQ %c ' fmask '\n'], char(int8('A') + i - 1), mafs(i));
+                freq((i-1) * 2 + 2) = sprintf(['FREQ %c ' fmask '\n'], char(int8('a') + i - 1), 1 - mafs(i));
+            end
+            pentable_header = ['PENTABLE' newline];
+            allele_combs = cell2mat(toxo.nfold(arrayfun(@(x) {[char(x) char(x)], [char(x) lower(char(x))], [lower(char(x)) lower(char(x))]}, (0:obj.order - 1) + 'A', 'UniformOutput', false)));
+            pts = vpa(obj.pt);
+            pentable = repmat("", length(allele_combs), 1);
+            for i = 1:length(pentable)
+                pentable(i) = sprintf(['%s ' fmask '\n'], allele_combs(i, :), pts(i));
+            end
+            s = strjoin([freq_header; freq; pentable_header; pentable], '');
+        end 
     end
     
     % Since MATLAB doesn't allow the definition of static variables, they
@@ -41,6 +58,10 @@ classdef PTable
         
         function out = format_gametes()
             out = 1;
+        end
+        
+        function out = format_genomesimla()
+            out = 2;
         end
     end
     
@@ -123,6 +144,10 @@ classdef PTable
                     %   mafs: array of doubles
                     fid = fopen(path, 'w+');
                     fprintf(fid, obj.to_gametes(fmask, varargin{1}));
+                    fclose(fid);
+                case obj.format_genomesimla
+                    fid = fopen(path, 'w+');
+                    fwrite(fid, obj.to_genomesimla(fmask, varargin{1}));
                     fclose(fid);
             end
         end
