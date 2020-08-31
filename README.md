@@ -1,4 +1,8 @@
 # Toxo
+<p>
+    <a href="https://doi.org/10.1186/s12859-020-3456-3" alt="DOI:10.1186/s12859-020-3456-3">
+    <img src="https://img.shields.io/badge/DOI-10.1186%2Fs12859--020--3456--3-informational"/></a>
+</p>
 
 Toxo is an object-oriented MATLAB library for calculating penetrance tables of any bivariate epistasis model. It is solely dedicated to bivariate models, that is, models where the penetrance is an expression of two intervening variables. The user specifies the model, its desired heritability (or prevalence) and Minor Allele Frequency (MAF) and the library maximizes the resulting table's prevalence (or heritability).
 
